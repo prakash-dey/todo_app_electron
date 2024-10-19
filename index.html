@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- <h1>To-Do List</h1> -->
+    <button class="stacked-button">Add todo</button>
+
+    <div class="todo-container">
+      <!-- <header id="date_time_cont">
+            <div class="date_cont"></div>
+            <div class="time_cont"></div>
+        </header> -->
+      <!-- <input type="text" id="taskInput" placeholder="Add a new task" /> -->
+
+      <ul id="taskLists">
+<!--         
+        <li>
+          <div class="sticky-note">
+            <div class="sticky-note-header">Reminder</div>
+            <div class="description">
+              Don't forget to submit the project by Monday. Also, check in with
+              the team!
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="sticky-note">
+            <div class="sticky-note-header">Reminder</div>
+            <div class="description">
+              Don't forget 
+            </div>
+            <div class="action-btns">
+              <img src="./images/tick.png" alt="tick" srcset="">
+              <img src="./images/delete.png" alt="delete" srcset="">
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="sticky-note">
+            <div class="sticky-note-header">Reminder</div>
+            <div class="description">
+              Don't forget to submit the project by Monday. Also, check in with
+              the team!
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="sticky-note">
+            <div class="sticky-note-header">Reminder</div>
+            <div class="description">
+              Don't forget to submit the project by Monday. Also, check in with
+              the team!
+            </div>
+          </div>
+        </li> -->
+      </ul>
+
+      <!-- Modal -->
+      <div class="modal" id="todoModal">
+        <div class="modal-content">
+          <span class="close" id="closeModalBtn">&times;</span>
+          <div class="modal-header">Add Task</div>
+
+          <!-- Task Header Input -->
+          <div class="input-field">
+            <label for="taskHeader">Task Header</label>
+            <input type="text" id="taskHeader" />
+          </div>
+
+          <!-- Task Description Input -->
+          <div class="input-field">
+            <label for="taskDescription">Task Description</label>
+            <textarea id="taskDescription" rows="4"></textarea>
+          </div>
+
+          <!-- Priority Selection -->
+          <div class="select-field">
+            <label>Priority</label>
+            <select id="priority">
+              <option value="red">Red (High)</option>
+              <option value="blue">Blue (Medium)</option>
+              <option value="yellow">Yellow (Low)</option>
+            </select>
+          </div>
+
+          <!-- Privacy Mode -->
+          <div class="privacy-field">
+            <label>Privacy Mode:</label><br />
+            <label class="priority-label"
+              ><input type="radio" name="privacy" value="public" checked />
+              Public</label
+            >
+            <label class="priority-label"
+              ><input type="radio" name="privacy" value="private" />
+              Private</label
+            >
+          </div>
+
+          <!-- Submit Button -->
+          <button class="submit-btn" id="submitTask">Add Task</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
