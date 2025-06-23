@@ -9,8 +9,8 @@ body {
 
 /* Sticky note style */
 .sticky-note {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   background-color: #ffabbb;
   padding: 20px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
@@ -76,9 +76,10 @@ body {
   flex-wrap: wrap;
   justify-content: flex-start;
   /* border: 5px solid red; */
-  height: 90%;
-  width: 90%;
+  /* height: 90%;
+  width: 90%; */
   gap: 40px 30px;
+  /* overflow: hidden; */
 }
 
 .stacked-button {
@@ -97,6 +98,7 @@ body {
   cursor: pointer;
   box-shadow: 5px 8px 10px rgba(0, 0, 0, 0.2); /* Main shadow */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 999;
 }
 
 /* Layer 1 - Second sticky note */

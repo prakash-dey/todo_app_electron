@@ -6,9 +6,9 @@ let win;
 
 function createWindow() {
   win = new BrowserWindow({
-    maxWidth: 800,
+    maxWidth: 1000,
     maxHeight: 470,
-    minWidth: 800,
+    minWidth: 1000,
     minHeight: 470,
     webPreferences: {
       nodeIntegration: true,
@@ -17,7 +17,7 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -59,6 +59,17 @@ ipcMain.on('get-todos', (event) => {
     }
   });
 });
+// Handle fetching to-do by id
+ipcMain.on('get-todo-by-id', (event, id) => {
+  db.getTodoById(id, (err, todo) => {
+    if (!err) {
+      win.webContents.send('todo-by-id', todo);
+    } else {
+      console.error('Error fetching todo by ID:', err);
+    }
+  });
+});
+
 
 ipcMain.on('update-todo', (event, todo) => {
   // Create an updates object with only defined properties
@@ -66,6 +77,7 @@ ipcMain.on('update-todo', (event, todo) => {
 
   // Add only defined fields to the updates object
   if (todo.priority !== undefined) updates.priority = todo.priority;
+  if (todo.title !== undefined) updates.title = todo.title;
   if (todo.description !== undefined) updates.description = todo.description;
   if (todo.status !== undefined) updates.status = todo.status;
   if (todo.mode !== undefined) updates.mode = todo.mode;
@@ -76,17 +88,17 @@ ipcMain.on('update-todo', (event, todo) => {
   }
 
   // Call the updateTodo function with the ID and updates object
-  db.updateTodo(todo.id, updates, (err) => { // Make sure callback is provided
+  db.updateTodo(todo.id, updates, (err) => {
       if (err) {
           console.error('Error updating to-do:', err);
-          return event.reply('update-todo-error', err.message); // Send error back to renderer
+          return event.reply('update-todo-error', err.message); 
       }
 
       // Fetch updated todos and send back to renderer
       db.getTodos((err, todos) => {
           if (err) {
               console.error('Error fetching todos after update:', err);
-              return event.reply('fetch-todos-error', err.message); // Send error back to renderer
+              return event.reply('fetch-todos-error', err.message); 
           }
           win.webContents.send('todos', todos);
       });

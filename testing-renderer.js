@@ -38,33 +38,79 @@ const stickyNoteColors = [
   "#f7a072", // Muted Peach
 ];
 
-const createTaskCard = ({ id, title, description, priority, mode, status }) => {
-  let index = Math.floor(Math.random() * (stickyNoteColors.length - 1 + 1));
-  let color = stickyNoteColors[index];
-  description = description.replace(/\n/g, "<br>");
-  let taskHtml = `<li data-id = ${id}>
-          <div class="sticky-note" style = "background-color:${color}">
-            <div class="sticky-note-header">${title}</div>
-            <div class="description">
-              ${description}
-            </div>
-            <div class="action-btns">
-              <img src="./images/tick.png" alt="tick" srcset="" class ="done">
-              <img src="./images/delete.png" alt="delete" srcset="" class = "delete">
-              <img src="./images/draw.png" alt="edit" srcset="" class = "edit">
-            </div>
-          </div>
-        </li>`;
+// Calculate the number of characters per line based on font-size and width of the sticky note
+const maxCharactersPerLine = 20; // Approximation based on font-size and note width
+const maxLinesPerCard = 6; // Assuming 6 lines fit in a 150px height with padding
 
-  document.querySelector("#taskLists").innerHTML += taskHtml;
+// Function to split description by both newline characters and length
+const splitDescriptionByLines = (text, maxCharsPerLine, maxLinesPerCard) => {
+  let parts = [];
+  let paragraphs = text.split('\n'); // Split by newline characters first
+
+  paragraphs.forEach(paragraph => {
+    let words = paragraph.split(' '); // Split by words to prevent mid-word breaks
+    let currentLine = '';
+    let lines = [];
+
+    words.forEach(word => {
+      // If adding the next word exceeds the character limit per line
+      if (currentLine.length + word.length + 1 > maxCharsPerLine) {
+        lines.push(currentLine); // Push current line to lines array
+        currentLine = word; // Start a new line with the current word
+      } else {
+        currentLine += (currentLine ? ' ' : '') + word; // Add word to current line
+      }
+    });
+
+    lines.push(currentLine); // Push the last line
+    while (lines.length > maxLinesPerCard) {
+      // Create chunks of text that fit in one card
+      parts.push(lines.slice(0, maxLinesPerCard).join('<br>'));
+      lines = lines.slice(maxLinesPerCard); // Continue with the remaining lines
+    }
+    if (lines.length > 0) {
+      parts.push(lines.join('<br>')); // Push remaining lines as the last chunk
+    }
+  });
+
+  return parts;
 };
 
+// Modified createTaskCard function to handle multiple cards for long descriptions
+const createTaskCard = ({ id, title, description, priority, mode, status }) => {
+  let descriptionChunks = splitDescriptionByLines(description, maxCharactersPerLine, maxLinesPerCard);
+
+  descriptionChunks.forEach((chunk, index) => {
+    // Append (1), (2), (3)... to the title for multi-part cards
+    let numberedTitle = descriptionChunks.length > 1 ? `${title} (${index + 1})` : title;
+
+    let indexColor = Math.floor(Math.random() * stickyNoteColors.length);
+    let color = stickyNoteColors[indexColor];
+
+    let taskHtml = `<li data-id="${id}">
+        <div class="sticky-note" style="background-color:${color}">
+          <div class="sticky-note-header">${numberedTitle}</div>
+          <div class="description">
+            ${chunk}
+          </div>
+          <div class="action-btns">
+            <img src="./images/tick.png" alt="tick" srcset="" class="done">
+            <img src="./images/delete.png" alt="delete" srcset="" class="delete">
+            <img src="./images/draw.png" alt="edit" srcset="" class="edit">
+          </div>
+        </div>
+      </li>`;
+
+    document.querySelector("#taskLists").innerHTML += taskHtml;
+  });
+};
+
+// The rest of your script to render tasks, handle modal interactions, etc.
 document.addEventListener("DOMContentLoaded", () => {
   const getAllTodoAndRender = (status = "pending") => {
     ipcRenderer.send("get-todos");
     ipcRenderer.on("todos", (event, todos) => {
       document.querySelector("#taskLists").innerHTML = "";
-      console.log(todos);
       todos.forEach((todo) => {
         if (!(status == "all") && todo.status == status) {
           createTaskCard(todo);
@@ -81,18 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("taskDescription").value = "";
     modal.style.display = "none";
   };
-  const openModal = (
-    e,
-    id = "",
-    title = "",
-    description = "",
-    priority = "yellow",
-    mode = "public"
-  ) => {
-    console.log("open modal called");
+
+  const openModal = (e, id = "", title = "", description = "", priority = "yellow", mode = "public") => {
     const modal = document.getElementById("todoModal");
     modal.style.display = "flex";
-    console.log("title:", title);
     document.getElementById("taskHeader").value = title;
     document.getElementById("taskDescription").value = description;
     document.getElementById("priority").value = priority;
@@ -107,19 +145,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   };
-  document
-    .querySelector(".stacked-button")
-    .addEventListener("click", openModal);
+
+  document.querySelector(".stacked-button").addEventListener("click", openModal);
 
   document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("keydown", (e) => {
       const modal = document.getElementById("todoModal");
-      console.log(e);
-      if (
-        (e.metaKey || e.ctrlKey) &&
-        e.key === "Enter" &&
-        modal.style.display === "flex"
-      ) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && modal.style.display === "flex") {
         e.preventDefault();
         addTask();
       }
@@ -136,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModal();
     }
   });
-  // Add a new task to the list
+
   function addTask() {
     let id = document.getElementById("submitTask").dataset.todoId;
     const title = document.getElementById("taskHeader").value;
@@ -150,14 +182,11 @@ document.addEventListener("DOMContentLoaded", () => {
       id = Date.now().toString();
     }
 
-    // Example of what happens when task is submitted (you can replace this with actual functionality)
     if (!title) {
       alert("Please fill out the task header");
       return;
     }
-    /***********TO DO : PUT A CHECK IN THE DESCRIPTION TEXT LENGTH ******************/
-    const allowedLine = 5;
-    const maxCharacter = 300;
+
     const todo = { id, title, description, priority, mode, status };
     if (newTask) {
       ipcRenderer.send("add-todo", todo);
@@ -170,8 +199,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Delete and mark as done the todo
-  document.querySelector("#taskLists").addEventListener("click", (e) => {
+ // Delete and mark as done the todo
+ document.querySelector("#taskLists").addEventListener("click", (e) => {
     if (e.target.classList.contains("delete")) {
       console.log(e);
       const id =
@@ -194,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.target.parentElement.parentElement.parentElement.dataset["id"];
       console.log("edit called for", id);
       // Open the modal
-      ipcRenderer.send("get-todo-by-id", id); 
+      ipcRenderer.send("get-todo-by-id", id); // Fixed event name
       ipcRenderer.on("todo-by-id", (event, todo) => {
         console.log(todo);
         if (todo) {

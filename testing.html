@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #container {
+      width: 200px;
+      height: 100px;
+      overflow: hidden; /* Hide overflow */
+      border: 1px solid black;
+      padding: 10px;
+      box-sizing: border-box; /* Include padding in width/height */
+    }
+  </style>
+  <title>Find Overflowing Word Index</title>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+  // Function to find the index of the overflowing word
+  function findOverflowWordIndex(container, text) {
+    // Clear the container and reset content
+    container.innerHTML = '';
+
+    // Split the text into words
+    const words = text.split(' ');
+    let content = '';
+
+    // Track the index of the last added word
+    for (let i = 0; i < words.length; i++) {
+      content += (i > 0 ? ' ' : '') + words[i]; // Add space before word if it's not the first word
+      container.innerHTML = content;
+
+      // Check if the content has started overflowing vertically
+      if (container.scrollHeight > container.clientHeight) {
+        // When overflow happens, return the index of the word causing it
+        return i;
+      }
+    }
+
+    // Return -1 if there's no overflow (optional)
+    return -1;
+  }
+
+  const container = document.getElementById('container');
+  const longText = "This is a long content that might overflow vertically. Let's see where it starts overflowing! Keep adding more text until we see the overflow.";
+
+  const overflowIndex = findOverflowWordIndex(container, longText);
+
+  console.log("Overflow starts at word index:", overflowIndex);
+</script>
+
+</body>
+</html>

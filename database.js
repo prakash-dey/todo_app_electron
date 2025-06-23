@@ -1,9 +1,16 @@
+const { app } = require('electron');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 // Initialize the database
-const dbPath = path.join(__dirname, 'todo.db');
-const db = new sqlite3.Database(dbPath);
+const dbPath = path.join(app.getPath('userData'), 'todo.db');
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error opening database', err);
+  } else {
+    console.log('Database connected at:', dbPath);
+  }
+});
 
 // Create the "todos" table if it doesn't exist
 db.serialize(() => {
@@ -147,7 +154,7 @@ function deleteTodo(id, callback) {
 module.exports = {
   addTodo,
   getTodos,
-  getTodoById, // Export the new function
+  getTodoById,
   updateTodo,
   deleteTodo,
 };
