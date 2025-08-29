@@ -6,8 +6,28 @@
     <title>To-Do List</title>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <!-- <h1>To-Do List</h1> -->
+    <div class="heading">
+      <h1>"Your are almost there"</h1>
+      <div class="filter">
+        <select id="priority-select">
+          <option value="all">🏳️‍🌈</option>
+          <option value="high"><div class="high">🔴</div></option>
+          <option class="medium" value="medium">🔵</option>
+          <option class="low" value="low">⚪️</option>
+        </select>
+        <select id="mode-select">
+          <option value="public">🔐</option>
+          <option value="private">🔒</option>
+        </select>
+        <select id="status-select">
+          <option value="pending">🕑</option>
+          <option value="done">✅</option>
+        </select>
+      </div>
+    </div>
     <button class="stacked-button">Add todo</button>
 
     <div class="todo-container">
@@ -18,7 +38,7 @@
       <!-- <input type="text" id="taskInput" placeholder="Add a new task" /> -->
 
       <ul id="taskLists">
-<!--         
+        <!--         
         <li>
           <div class="sticky-note">
             <div class="sticky-note-header">Reminder</div>
@@ -82,9 +102,9 @@
           <div class="select-field">
             <label>Priority</label>
             <select id="priority">
-              <option value="red">Red (High)</option>
-              <option value="blue">Blue (Medium)</option>
-              <option value="yellow">Yellow (Low)</option>
+              <option value="high">Red (High)</option>
+              <option value="medium">Blue (Medium)</option>
+              <option value="low">White (Low)</option>
             </select>
           </div>
 
