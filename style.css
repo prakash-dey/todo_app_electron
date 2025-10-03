@@ -55,6 +55,9 @@ h1{
 .sticky-note:hover {
   transform: rotate(0deg) scale(1.05);
 }
+.sticky-note:hover .action-btns{
+  display: flex;
+}
 
 /* Optional header for the sticky note */
 .sticky-note-header {
@@ -92,7 +95,7 @@ h1{
 
 .action-btns {
   position: absolute;
-  display: flex;
+  display: none;
   flex-direction: row-reverse;
   gap: 8px;
   bottom: 5px;
@@ -302,6 +305,9 @@ h1{
 }
 .todo-container{
   min-height: 50vh;
+}
+.hide{
+  display: none;
 }
 
 
