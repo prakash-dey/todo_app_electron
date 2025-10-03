@@ -300,6 +300,9 @@ h1{
   font-family: "Comic Sans MS", sans-serif;
   color: #555;
 }
+.todo-container{
+  min-height: 50vh;
+}
 
 
 
