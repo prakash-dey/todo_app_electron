@@ -10,7 +10,7 @@
   <body>
     <!-- <h1>To-Do List</h1> -->
     <div class="heading">
-      <h1>"Your are almost there"</h1>
+      <h1>"You are almost there"</h1>
       <div class="filter">
         <select id="priority-select">
           <option value="all">🏳️‍🌈</option>
@@ -93,6 +93,12 @@
           </div>
 
           <!-- Task Description Input -->
+           <div class="text-design-btn">
+            <button class="design-btn" id="boldBtn"><b>B</b></button>
+            <button class="design-btn" id="italicBtn"><i>I</i></button>
+            <button class="design-btn" id="underlineBtn"><u>U</u></button>
+            <button class="design-btn" id="strikeBtn"><s>S</s></button>
+           </div>
           <div class="input-field">
             <label for="taskDescription">Task Description</label>
             <textarea id="taskDescription" rows="4"></textarea>
@@ -101,10 +107,11 @@
           <!-- Priority Selection -->
           <div class="select-field">
             <label>Priority</label>
+            <div id="priority-color"></div>
             <select id="priority">
-              <option value="high">Red (High)</option>
-              <option value="medium">Blue (Medium)</option>
-              <option value="low">White (Low)</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
             </select>
           </div>
 

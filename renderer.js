@@ -41,16 +41,25 @@ const stickyNoteColors = [
 
 let allData = [];
 let displayData = [];
+const priorityColors = {
+  low: "white", // yellow
+  medium: "#00b0ff", // blue
+  high: "#ef1447ff", // red
+};
 
 const createTaskCard = ({ id, title, description, priority, mode, status }) => {
+  // description = description.replaceAll("/done", "");
   let index = Math.floor(Math.random() * (stickyNoteColors.length - 1 + 1));
   let color = stickyNoteColors[index];
+  description = description.replace(/\/done/gi, "<i> done </i>");
   description = description.replace(/\n/g, "<br>");
   let taskHtml = `<li data-id = ${id}>
           <div class="sticky-note ${priority}" style = "background-color:${color}">
             <div class="sticky-note-header">${title}</div>
             <div class="description">
+        
               ${description}
+       
             </div>
             <div class="action-btns">
               <img src="./images/tick.png" alt="tick" srcset="" class ="done">
@@ -64,17 +73,15 @@ const createTaskCard = ({ id, title, description, priority, mode, status }) => {
 };
 const filterData = () => {
   const mapPriority = {
-    "yellow": "low",
-    "blue": "medium",
-    "red": "high",
+    yellow: "low",
+    blue: "medium",
+    red: "high",
   };
   document.querySelector("#taskLists").innerHTML = "";
   const status = document.getElementById("status-select").value;
   let priority = document.getElementById("priority-select").value;
   const mode = document.getElementById("mode-select").value;
   priority = mapPriority[priority] || priority;
-
-  console.log("Filtering data for", status, priority, mode);
 
   const filteredData = allData.filter((todo) => {
     return (
@@ -94,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ipcRenderer.send("get-todos");
     ipcRenderer.on("todos", (event, todos) => {
       document.querySelector("#taskLists").innerHTML = "";
-      console.log(todos);
       allData = todos;
       filterData();
     });
@@ -106,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("todoModal");
     document.getElementById("taskHeader").value = "";
     document.getElementById("taskDescription").value = "";
+    document.getElementById("priority-color").style.backgroundColor = priorityColors["low"];
     modal.style.display = "none";
   };
   const openModal = (
@@ -116,13 +123,12 @@ document.addEventListener("DOMContentLoaded", () => {
     priority = "low",
     mode = "public"
   ) => {
-    console.log("open modal called");
     const modal = document.getElementById("todoModal");
     modal.style.display = "flex";
-    console.log("title:", title);
     document.getElementById("taskHeader").value = title;
     document.getElementById("taskDescription").value = description;
     document.getElementById("priority").value = priority;
+    document.getElementById("priority-color").style.backgroundColor = priorityColors[priority];
     document.querySelectorAll('input[name="privacy"]').forEach((radio) => {
       if (radio.value == mode) radio.checked = true;
     });
@@ -139,10 +145,86 @@ document.addEventListener("DOMContentLoaded", () => {
     .querySelector(".stacked-button")
     .addEventListener("click", openModal);
 
+  const addHTMLTagInTextArea = (tag) => {
+    const textarea = document.getElementById("taskDescription");
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+
+    // Nothing selected
+    console.log({ start, end });
+    if (start === end) return;
+
+    const selected = text.substring(start, end);
+
+    // Check if selected text is already wrapped in <s> tags
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+
+    const OpenTag = `<${tag}>`;
+    const CloseTag = `</${tag}>`;
+
+    // Detect if selection is already surrounded by <s>...</s>
+    const isWrapped = before.endsWith(OpenTag) && after.startsWith(CloseTag);
+    let newText;
+
+    if (isWrapped) {
+      // Unwrap the <s> tags
+      newText =
+        before.slice(0, -OpenTag.length) +
+        selected +
+        after.slice(CloseTag.length);
+    } else {
+      // Check if selection is *inside* existing <s> ... </s>
+      const openBefore = before.lastIndexOf(OpenTag);
+      const closeBefore = before.lastIndexOf(CloseTag);
+
+      const insideExisting = openBefore > closeBefore;
+
+      if (insideExisting) {
+        // Already inside <s> block, do nothing
+        return;
+      }
+
+      // Wrap with <s> tags
+      newText = before + OpenTag + selected + CloseTag + after;
+    }
+
+    textarea.value = newText;
+
+    // Reselect the same text region (optional)
+    // added tag
+    console.log({ isWrapped, start, end, selected, text: text.length });
+    if (!isWrapped) {
+      textarea.selectionStart = start + OpenTag.length;
+      textarea.selectionEnd = start + OpenTag.length + selected.length;
+    } else {
+      // removed tag
+      textarea.selectionStart = start - OpenTag.length;
+      textarea.selectionEnd = start - OpenTag.length + selected.length;
+    }
+    // textarea.selectionStart = start;
+    // textarea.selectionEnd = start + selected.length + (isWrapped ? 0 : OpenTag.length + CloseTag.length);
+    textarea.focus();
+  };
+
+  // design buttons functionality
+  document
+    .getElementById("boldBtn")
+    .addEventListener("click", () => addHTMLTagInTextArea("b"));
+  document
+    .getElementById("italicBtn")
+    .addEventListener("click", () => addHTMLTagInTextArea("i"));
+  document
+    .getElementById("underlineBtn")
+    .addEventListener("click", () => addHTMLTagInTextArea("u"));
+  document
+    .getElementById("strikeBtn")
+    .addEventListener("click", () => addHTMLTagInTextArea("s"));
+
   document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("keydown", (e) => {
       const modal = document.getElementById("todoModal");
-      console.log(e);
       if (
         (e.metaKey || e.ctrlKey) &&
         e.key === "Enter" &&
@@ -201,18 +283,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Delete and mark as done the todo
   document.querySelector("#taskLists").addEventListener("click", (e) => {
     if (e.target.classList.contains("delete")) {
-      console.log(e);
       const id =
         e.target.parentElement.parentElement.parentElement.dataset["id"];
-      console.log(id);
       ipcRenderer.send("delete-todo", id);
       getAllTodoAndRender();
     }
     if (e.target.classList.contains("done")) {
-      console.log(e);
       const id =
         e.target.parentElement.parentElement.parentElement.dataset["id"];
-      console.log(id);
       ipcRenderer.send("update-todo", { id: id, status: "done" });
       getAllTodoAndRender();
     }
@@ -220,11 +298,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // get the id of the element
       const id =
         e.target.parentElement.parentElement.parentElement.dataset["id"];
-      console.log("edit called for", id);
       // Open the modal
       ipcRenderer.send("get-todo-by-id", id);
       ipcRenderer.on("todo-by-id", (event, todo) => {
-        console.log(todo);
         if (todo) {
           // Check if the todo object exists
           openModal(
@@ -249,5 +325,20 @@ document.addEventListener("DOMContentLoaded", () => {
     select.addEventListener("change", filterData);
   });
 
+  // Change priority-color div background on select change
+  const prioritySelect = document.getElementById("priority");
+  const priorityColorDiv = document.getElementById("priority-color");
+
+  if (prioritySelect && priorityColorDiv) {
+    prioritySelect.addEventListener("change", (e) => {
+      const value = e.target.value;
+      priorityColorDiv.style.backgroundColor =
+        priorityColors[value] || "#fef68a";
+    });
+
+    // Set initial color
+    priorityColorDiv.style.backgroundColor =
+      priorityColors[prioritySelect.value] || "#fef68a";
+  }
   //
 });
