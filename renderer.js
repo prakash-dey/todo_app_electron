@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .querySelector(".stacked-button")
     .addEventListener("click", openModal);
 
-  const addHTMLTagInTextArea = (tag) => {
+  const addHTMLTagInTextArea = (tag,className = null) => {
     const textarea = document.getElementById("taskDescription");
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const before = text.substring(0, start);
     const after = text.substring(end);
 
-    const OpenTag = `<${tag}>`;
+    const OpenTag = `<${tag} ${className ? `class="${className}"` : ""}>`;
     const CloseTag = `</${tag}>`;
 
     // Detect if selection is already surrounded by <s>...</s>
@@ -219,8 +219,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("underlineBtn")
     .addEventListener("click", () => addHTMLTagInTextArea("u"));
   document
-    .getElementById("strikeBtn")
-    .addEventListener("click", () => addHTMLTagInTextArea("s"));
+    .getElementById("strikeBtnDone")
+    .addEventListener("click", () => addHTMLTagInTextArea("s","done"));
+  document
+    .getElementById("strikeBtnCancel")
+    .addEventListener("click", () => addHTMLTagInTextArea("s","cancel"));
 
   document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("keydown", (e) => {

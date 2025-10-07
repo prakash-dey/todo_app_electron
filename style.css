@@ -81,6 +81,9 @@ h1{
 .sticky-note.high::before{
   background: rgba(236, 10, 10, 0.3);; /* Light pink for red sticky note */
 }
+.sticky-note.medium::before{
+  background: rgba(65, 91, 239, 0.3);; /* Light pink for red sticky note */
+}
 /*  */
 .description {
   margin-bottom: 20px;
@@ -327,9 +330,12 @@ input[type="radio"] {
 }
 
 /* s{
-  text-decoration-color: red;
+  text-decoration-color: green;
   text-decoration-thickness: 2px; 
 } */
+s.cancel{
+  text-decoration-color: red;
+}
 .text-design-btn{
   padding: 8px 0px;
 }
