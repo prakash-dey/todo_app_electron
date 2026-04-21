@@ -339,5 +339,14 @@ document.addEventListener("DOMContentLoaded", () => {
     priorityColorDiv.style.backgroundColor =
       priorityColors[prioritySelect.value] || "#fef68a";
   }
+  // Always-on-top toggle (starts unpinned)
+  const pinBtn = document.getElementById("pinBtn");
+  pinBtn.style.opacity = "0.35";
+  pinBtn.addEventListener("click", () => {
+    ipcRenderer.send("toggle-always-on-top");
+  });
+  ipcRenderer.on("always-on-top-changed", (_, isOnTop) => {
+    pinBtn.style.opacity = isOnTop ? "1" : "0.35";
+  });
   //
 });

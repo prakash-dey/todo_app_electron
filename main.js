@@ -12,6 +12,7 @@ function createWindow() {
     height: 600,
     resizable: false,
     maximizable: false,
+    alwaysOnTop: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -118,6 +119,13 @@ ipcMain.on('update-todo', (event, todo) => {
   });
 });
 
+
+// Handle toggling always-on-top
+ipcMain.on('toggle-always-on-top', () => {
+  const current = win.isAlwaysOnTop();
+  win.setAlwaysOnTop(!current);
+  win.webContents.send('always-on-top-changed', !current);
+});
 
 // Handle deleting a to-do
 ipcMain.on('delete-todo', (event, id) => {
