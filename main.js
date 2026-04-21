@@ -8,8 +8,10 @@ let win;
 function createWindow() {
   const iconPath = path.join(__dirname, 'assets/icon.png');
   const windowOptions = {
-    minWidth: 1000,
-    minHeight: 470,
+    width: 800,
+    height: 600,
+    resizable: false,
+    maximizable: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
