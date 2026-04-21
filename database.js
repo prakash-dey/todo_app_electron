@@ -2,31 +2,36 @@ const { app } = require('electron');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Initialize the database
-const dbPath = path.join(app.getPath('userData'), 'todo.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error opening database', err);
-  } else {
-    console.log('Database connected at:', dbPath);
-  }
-});
+let db;
 
-// Create the "todos" table if it doesn't exist
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS todos (
-      id TEXT PRIMARY KEY,           -- Change id to TEXT PRIMARY KEY
-      title TEXT,                   
-      priority TEXT,
-      description TEXT,
-      createdAt TEXT,
-      updatedAt TEXT,
-      status TEXT,
-      mode TEXT
-    )
-  `);
-});
+function getDb() {
+  if (!db) {
+    const dbPath = path.join(app.getPath('userData'), 'todo.db');
+    db = new sqlite3.Database(dbPath, (err) => {
+      if (err) {
+        console.error('Error opening database', err);
+      } else {
+        console.log('Database connected at:', dbPath);
+      }
+    });
+
+    db.serialize(() => {
+      db.run(`
+        CREATE TABLE IF NOT EXISTS todos (
+          id TEXT PRIMARY KEY,
+          title TEXT,
+          priority TEXT,
+          description TEXT,
+          createdAt TEXT,
+          updatedAt TEXT,
+          status TEXT,
+          mode TEXT
+        )
+      `);
+    });
+  }
+  return db;
+}
 
 // Function to add a new to-do item to the database
 function addTodo(id, title, priority, description, status, mode, callback) {
@@ -38,7 +43,7 @@ function addTodo(id, title, priority, description, status, mode, callback) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.run(query, [id, title, priority, description, createdAt, updatedAt, status, mode], function (err) {
+  getDb().run(query, [id, title, priority, description, createdAt, updatedAt, status, mode], function (err) {
     if (err) {
       console.error('Error adding to-do:', err);
       return callback(err);
@@ -52,7 +57,7 @@ function addTodo(id, title, priority, description, status, mode, callback) {
 function getTodos(callback) {
   const query = 'SELECT * FROM todos';
 
-  db.all(query, [], (err, rows) => {
+  getDb().all(query, [], (err, rows) => {
     if (err) {
       console.error('Error fetching to-dos:', err);
       return callback(err);
@@ -65,7 +70,7 @@ function getTodos(callback) {
 function getTodoById(id, callback) {
   const query = 'SELECT * FROM todos WHERE id = ?';
 
-  db.get(query, [id], (err, row) => {
+  getDb().get(query, [id], (err, row) => {
     if (err) {
       console.error('Error fetching to-do by ID:', err);
       return callback(err);
@@ -126,7 +131,7 @@ function updateTodo(id, updates, callback) {
   // Add the ID to the params
   params.push(id);
 
-  db.run(query, params, function (err) {
+  getDb().run(query, params, function (err) {
     if (err) {
       console.error('Error updating to-do:', err);
       return callback(err);
@@ -141,7 +146,7 @@ function updateTodo(id, updates, callback) {
 function deleteTodo(id, callback) {
   const query = 'DELETE FROM todos WHERE id = ?';
 
-  db.run(query, [id], function (err) {
+  getDb().run(query, [id], function (err) {
     if (err) {
       console.error('Error deleting to-do:', err);
       return callback(err);

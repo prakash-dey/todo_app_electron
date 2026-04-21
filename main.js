@@ -10,6 +10,7 @@ function createWindow() {
     // maxHeight: 470,
     minWidth: 1000,
     minHeight: 470,
+    icon: path.join(__dirname, 'assets/icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -21,6 +22,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(path.join(__dirname, 'assets/icon.png'));
+  }
   createWindow();
 
   app.on('activate', () => {
