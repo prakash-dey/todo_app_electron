@@ -1,29 +1,36 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const db = require('./database');
 
 let win;
 
 function createWindow() {
-  win = new BrowserWindow({
-    // maxWidth: 1000,
-    // maxHeight: 470,
+  const iconPath = path.join(__dirname, 'assets/icon.png');
+  const windowOptions = {
     minWidth: 1000,
     minHeight: 470,
-    icon: path.join(__dirname, 'assets/icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
-  });
+  };
 
+  if (fs.existsSync(iconPath)) {
+    windowOptions.icon = iconPath;
+  }
+
+  win = new BrowserWindow(windowOptions);
   win.loadFile('index.html');
   // win.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
   if (process.platform === 'darwin') {
-    app.dock.setIcon(path.join(__dirname, 'assets/icon.png'));
+    const iconPath = path.join(__dirname, 'assets/icon.png');
+    if (fs.existsSync(iconPath)) {
+      app.dock.setIcon(iconPath);
+    }
   }
   createWindow();
 

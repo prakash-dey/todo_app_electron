@@ -110,9 +110,36 @@ input[type="radio"] {
   bottom: 5px;
   right: 5px;
 }
-.action-btns img {
-  width: 15px;
+.action-btn {
+  width: 24px;
+  height: 24px;
+  padding: 3px;
   cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.action-btn svg {
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+}
+.action-btn.done:hover {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+.action-btn.delete:hover {
+  background-color: rgba(239, 20, 71, 0.15);
+  color: #c62828;
+}
+.action-btn.edit:hover {
+  background-color: rgba(33, 150, 243, 0.15);
+  color: #1565c0;
 }
 
 /* #addTaskBtn {

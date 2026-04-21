@@ -1,5 +1,4 @@
 const { ipcRenderer } = require("electron");
-const { stat } = require("original-fs");
 const stickyNoteColors = [
   "#fef68a", // Light Yellow (Pastel)
   "#ffabbb", // Pastel Pink
@@ -53,7 +52,7 @@ const createTaskCard = ({ id, title, description, priority, mode, status }) => {
   let color = stickyNoteColors[index];
   description = description.replace(/\/done/gi, "<i> done </i>");
   description = description.replace(/\n/g, "<br>");
-  let taskHtml = `<li data-id = ${id}>
+  let taskHtml = `<li data-id="${id}">
           <div class="sticky-note ${priority}" style = "background-color:${color}">
             <div class="sticky-note-header">${title}</div>
             <div class="description">
@@ -62,9 +61,15 @@ const createTaskCard = ({ id, title, description, priority, mode, status }) => {
        
             </div>
             <div class="action-btns">
-              <img src="./images/tick.png" alt="tick" srcset="" class ="done">
-              <img src="./images/delete.png" alt="delete" srcset="" class = "delete">
-              <img src="./images/draw.png" alt="edit" srcset="" class = "edit">
+              <button class="action-btn done" title="Mark as done">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="action-btn delete" title="Delete">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+              <button class="action-btn edit" title="Edit">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
             </div>
           </div>
         </li>`;
@@ -97,14 +102,15 @@ const filterData = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const getAllTodoAndRender = (status = "pending") => {
+  const getAllTodoAndRender = () => {
     ipcRenderer.send("get-todos");
-    ipcRenderer.on("todos", (event, todos) => {
-      document.querySelector("#taskLists").innerHTML = "";
-      allData = todos;
-      filterData();
-    });
   };
+
+  ipcRenderer.on("todos", (event, todos) => {
+    document.querySelector("#taskLists").innerHTML = "";
+    allData = todos;
+    filterData();
+  });
 
   getAllTodoAndRender();
 
@@ -293,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.target.parentElement.parentElement.parentElement.dataset["id"];
       // Open the modal
       ipcRenderer.send("get-todo-by-id", id);
-      ipcRenderer.on("todo-by-id", (event, todo) => {
+      ipcRenderer.once("todo-by-id", (event, todo) => {
         if (todo) {
           // Check if the todo object exists
           openModal(

@@ -4,14 +4,20 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "postinstall": "electron-rebuild",
+    "rebuild": "electron-rebuild",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "A simple todo/task manager built with Electron and SQLite",
   "devDependencies": {
+    "@electron/rebuild": "^3.7.2",
     "electron": "^33.4.11",
     "electron-builder": "^25.1.8"
   },
@@ -19,18 +25,56 @@
     "sqlite3": "^5.1.7"
   },
   "build": {
-    "appId": "com.example.manage",
+    "appId": "com.example.manager",
+    "productName": "Manager",
+    "files": [
+      "main.js",
+      "renderer.js",
+      "database.js",
+      "index.html",
+      "style.css",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/sqlite3/**/*"
+    ],
+    "npmRebuild": true,
     "mac": {
-      "target": "dmg",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
       "icon": "assets/icon.icns"
     },
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
       "icon": "assets/icon.ico"
     },
     "linux": {
-      "target": "AppImage",
-      "icon": "assets/icon.png"
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Utility"
     }
   }
 }
