@@ -120,6 +120,19 @@ ipcMain.on('update-todo', (event, todo) => {
 });
 
 
+// Handle app settings (key/value store)
+ipcMain.on('get-setting', (event, key) => {
+  db.getSetting(key, (err, value) => {
+    if (!err) win.webContents.send('setting', { key, value });
+  });
+});
+
+ipcMain.on('set-setting', (event, { key, value }) => {
+  db.setSetting(key, value, (err) => {
+    if (err) console.error('Error saving setting:', err);
+  });
+});
+
 // Handle toggling always-on-top
 ipcMain.on('toggle-always-on-top', () => {
   const current = win.isAlwaysOnTop();

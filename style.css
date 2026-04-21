@@ -17,10 +17,20 @@ body {
   display: flex;
   justify-content: space-around;
 }
-h1{
+h1 {
   width: fit-content;
   font-size: 40px;
-  
+  border-bottom: 2px solid transparent;
+  outline: none;
+  cursor: default;
+  transition: border-color 0.2s ease;
+}
+h1:hover {
+  border-bottom: 2px solid transparent;
+}
+h1.editing {
+  border-bottom: 2px solid #999;
+  cursor: text;
 }
 .filter{
   border-bottom:1px solid #ccc ;

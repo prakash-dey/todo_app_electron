@@ -339,6 +339,44 @@ document.addEventListener("DOMContentLoaded", () => {
     priorityColorDiv.style.backgroundColor =
       priorityColors[prioritySelect.value] || "#fef68a";
   }
+  // Editable h1 title — load saved value, save on blur
+  const appTitle = document.getElementById("appTitle");
+  const DEFAULT_TITLE = '"You are almost there"';
+
+  ipcRenderer.on("setting", (_, { key, value }) => {
+    if (key === "appTitle" && value) {
+      appTitle.textContent = value;
+    }
+  });
+  ipcRenderer.send("get-setting", "appTitle");
+
+  const startEditing = () => {
+    appTitle.contentEditable = "plaintext-only";
+    appTitle.classList.add("editing");
+    appTitle.focus();
+    // place cursor at end
+    const range = document.createRange();
+    range.selectNodeContents(appTitle);
+    range.collapse(false);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  };
+
+  const stopEditing = () => {
+    const text = appTitle.textContent.trim();
+    if (!text) appTitle.textContent = DEFAULT_TITLE;
+    appTitle.contentEditable = "false";
+    appTitle.classList.remove("editing");
+    ipcRenderer.send("set-setting", { key: "appTitle", value: appTitle.textContent.trim() });
+  };
+
+  appTitle.addEventListener("dblclick", startEditing);
+  appTitle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); stopEditing(); }
+    if (e.key === "Escape") { appTitle.textContent = DEFAULT_TITLE; stopEditing(); }
+  });
+  appTitle.addEventListener("blur", stopEditing);
+
   // Always-on-top toggle (starts unpinned)
   const pinBtn = document.getElementById("pinBtn");
   pinBtn.style.opacity = "0.35";

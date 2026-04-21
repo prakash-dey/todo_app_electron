@@ -28,6 +28,12 @@ function getDb() {
           mode TEXT
         )
       `);
+      db.run(`
+        CREATE TABLE IF NOT EXISTS settings (
+          key TEXT PRIMARY KEY,
+          value TEXT
+        )
+      `);
     });
   }
   return db;
@@ -156,10 +162,28 @@ function deleteTodo(id, callback) {
   });
 }
 
+function getSetting(key, callback) {
+  getDb().get('SELECT value FROM settings WHERE key = ?', [key], (err, row) => {
+    if (err) return callback(err);
+    callback(null, row ? row.value : null);
+  });
+}
+
+function setSetting(key, value, callback) {
+  getDb().run(
+    `INSERT INTO settings (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    [key, value],
+    (err) => callback(err)
+  );
+}
+
 module.exports = {
   addTodo,
   getTodos,
   getTodoById,
   updateTodo,
   deleteTodo,
+  getSetting,
+  setSetting,
 };
