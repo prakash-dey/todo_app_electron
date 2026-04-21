@@ -133,12 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (radio.value == mode) radio.checked = true;
     });
     document.getElementById("submitTask").dataset.todoId = id;
-
-    window.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        closeModal();
-      }
-    });
   };
   /**Open modal on add button click */
   document
@@ -225,21 +219,17 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("strikeBtnCancel")
     .addEventListener("click", () => addHTMLTagInTextArea("s","cancel"));
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.body.addEventListener("keydown", (e) => {
-      const modal = document.getElementById("todoModal");
-      if (
-        (e.metaKey || e.ctrlKey) &&
-        e.key === "Enter" &&
-        modal.style.display === "flex"
-      ) {
-        e.preventDefault();
-        addTask();
-      }
-      if (e.key === "Escape" && modal.style.display === "flex") {
-        closeModal();
-      }
-    });
+  document.body.addEventListener("keydown", (e) => {
+    const modal = document.getElementById("todoModal");
+    if (modal.style.display !== "flex") return;
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      addTask();
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeModal();
+    }
   });
 
   document.getElementById("todoModal").addEventListener("click", (e) => {
