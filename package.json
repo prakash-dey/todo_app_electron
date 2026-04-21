@@ -1,5 +1,5 @@
 {
-  "name": "todo-app-electron",
+  "name": "Manager",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "sqlite3": "^5.1.7"
   },
   "build": {
-    "appId": "com.example.myapp",
+    "appId": "com.example.manage",
     "mac": {
       "target": "dmg",
       "icon": "assets/icon.icns"
