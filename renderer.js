@@ -279,29 +279,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Delete and mark as done the todo
+  // Delete, mark-done, and edit actions for todo cards.
   document.querySelector("#taskLists").addEventListener("click", (e) => {
-    if (e.target.classList.contains("delete")) {
-      const id =
-        e.target.parentElement.parentElement.parentElement.dataset["id"];
+    const actionButton = e.target.closest(".action-btn");
+    if (!actionButton) return;
+
+    // Ignore the second click of a double click to avoid accidental repeated actions.
+    if (e.detail > 1) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const taskItem = actionButton.closest("li[data-id]");
+    const id = taskItem?.dataset?.id;
+    if (!id) return;
+
+    if (actionButton.classList.contains("delete")) {
       ipcRenderer.send("delete-todo", id);
       getAllTodoAndRender();
+      return;
     }
-    if (e.target.classList.contains("done")) {
-      const id =
-        e.target.parentElement.parentElement.parentElement.dataset["id"];
+
+    if (actionButton.classList.contains("done")) {
       ipcRenderer.send("update-todo", { id: id, status: "done" });
       getAllTodoAndRender();
+      return;
     }
-    if (e.target.classList.contains("edit")) {
-      // get the id of the element
-      const id =
-        e.target.parentElement.parentElement.parentElement.dataset["id"];
-      // Open the modal
+
+    if (actionButton.classList.contains("edit")) {
       ipcRenderer.send("get-todo-by-id", id);
       ipcRenderer.once("todo-by-id", (event, todo) => {
         if (todo) {
-          // Check if the todo object exists
           openModal(
             event,
             id,
@@ -314,8 +322,6 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("Error: Todo not found");
         }
       });
-
-      // get the data for corresponding id to modal
     }
   });
 

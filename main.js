@@ -5,8 +5,20 @@ const db = require('./database');
 
 let win;
 
+function getFirstExistingIconPath(fileNames) {
+  for (const fileName of fileNames) {
+    const fullPath = path.join(__dirname, `assets/${fileName}`);
+    if (fs.existsSync(fullPath)) return fullPath;
+  }
+  return null;
+}
+
 function createWindow() {
-  const iconPath = path.join(__dirname, 'assets/icon.png');
+  const iconPath = process.platform === 'darwin'
+    ? getFirstExistingIconPath(['icon.icns'])
+    : process.platform === 'win32'
+      ? getFirstExistingIconPath(['icon.ico', 'icon.png'])
+      : getFirstExistingIconPath(['icon.png']);
   const windowOptions = {
     width: 800,
     height: 600,
@@ -30,9 +42,14 @@ function createWindow() {
 
 app.whenReady().then(() => {
   if (process.platform === 'darwin') {
-    const iconPath = path.join(__dirname, 'assets/icon.png');
-    if (fs.existsSync(iconPath)) {
-      app.dock.setIcon(iconPath);
+    // macOS runtime Dock icon prefers PNG. .icns is still used by electron-builder packaging.
+    const dockIconPath = getFirstExistingIconPath(['icon.png', 'icon.icns']);
+    if (dockIconPath) {
+      try {
+        app.dock.setIcon(dockIconPath);
+      } catch (error) {
+        console.warn(`Unable to set Dock icon from ${dockIconPath}:`, error.message);
+      }
     }
   }
   createWindow();
